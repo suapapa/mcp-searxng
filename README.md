@@ -27,6 +27,55 @@ An [MCP server](https://modelcontextprotocol.io/introduction) implementation tha
   - Inputs:
     - `url` (string): The URL to fetch and process
 
+## Transport
+
+This server supports two MCP transports:
+
+| Transport | Use case | How to enable |
+|-----------|----------|---------------|
+| **stdio** (default) | Claude Desktop, local CLI | Default — no extra config |
+| **Streamable HTTP** | Cursor, remote clients, Docker | Set `MCP_TRANSPORT=http` |
+
+### Streamable HTTP
+
+Start the server in HTTP mode:
+
+```bash
+MCP_TRANSPORT=http SEARXNG_URL=http://localhost:8080 node dist/index.js
+```
+
+Environment variables:
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `MCP_TRANSPORT` | `stdio` | Set to `http` for Streamable HTTP |
+| `MCP_HOST` | `127.0.0.1` | Bind address (`0.0.0.0` for Docker) |
+| `MCP_PORT` | `3000` | HTTP port |
+| `MCP_PATH` | `/mcp` | MCP endpoint path |
+
+Cursor MCP config example:
+
+```json
+{
+  "mcpServers": {
+    "searxng": {
+      "url": "http://localhost:3000/mcp"
+    }
+  }
+}
+```
+
+Docker HTTP mode:
+
+```bash
+docker run -p 3000:3000 \
+  -e SEARXNG_URL=http://host.docker.internal:8080 \
+  -e MCP_TRANSPORT=http \
+  isokoliuk/mcp-searxng:latest
+```
+
+The Docker image defaults to stdio (for Claude Desktop). For HTTP mode, set `MCP_TRANSPORT=http` and publish port 3000.
+
 ## Configuration
 
 ### Setting the SEARXNG_URL
